@@ -2,8 +2,10 @@
 extern crate test;
 
 
+use std::cmp::min;
 use std::collections::{BinaryHeap, HashMap};
 use std::f64::INFINITY;
+use std::slice;
 
 use crate::math::distance::distance;
 use crate::types::{Position, Segment};
@@ -13,6 +15,33 @@ use crate::util::reachable_positions::reachable_positions;
 mod util;
 mod math;
 mod types;
+
+
+#[no_mangle]
+pub unsafe extern "C" fn find_path_ffi(output_arr: *mut Position, output_arr_size: i32, obstacles: *const Segment, obstacles_size: i32, start: *const Position, end: *const Position) -> i32 {
+    // INPUT:
+    let start = *start.as_ref().expect("null start position");
+    let end = *end.as_ref().expect("null end position");
+
+    assert!(!obstacles.is_null(), "null obstacle pointer");
+    assert!(obstacles_size > 0, "negative obstacle_size");
+    let obstacles: &[Segment] = slice::from_raw_parts(obstacles, obstacles_size as usize);
+
+    // OUTPUT:
+    assert!(!output_arr.is_null(), "null output_arr pointer");
+    assert!(output_arr_size > 0, "negative output_arr_size");
+    let arr: &mut [Position] = slice::from_raw_parts_mut(output_arr, output_arr as usize);
+
+    let result = find_path(start, obstacles, end);
+    if let Some(result) = result {
+        let output_size = min(output_arr as usize, result.len());
+        for i in 0..output_size {
+            arr[i] = result[i];
+        }
+        return output_size as i32;
+    }
+    return 0;
+}
 
 /// find_path is a simple implementation of Dijkstra algorithm over a visibility graph defined by
 /// the obstacles.
@@ -138,64 +167,89 @@ mod tests {
         ]))
     }
 
+    fn maze() -> Vec<Segment> {
+        vec![
+            Segment {
+                start: Position { x: -100, y: -1 },
+                end: Position { x: 100, y: -1 },
+            },
+            Segment {
+                start: Position { x: 11, y: 100 },
+                end: Position { x: 11, y: -100 },
+            },
+            Segment {
+                start: Position { x: 100, y: 11 },
+                end: Position { x: -100, y: 11 },
+            },
+            Segment {
+                start: Position { x: -1, y: 100 },
+                end: Position { x: -1, y: -100 },
+            },
+            Segment {
+                start: Position { x: 1, y: 9 },
+                end: Position { x: 1, y: -100 },
+            },
+            Segment {
+                start: Position { x: 3, y: 9 },
+                end: Position { x: 3, y: -100 },
+            },
+            Segment {
+                start: Position { x: 5, y: 9 },
+                end: Position { x: 5, y: -100 },
+            },
+            Segment {
+                start: Position { x: 7, y: 9 },
+                end: Position { x: 7, y: -100 },
+            },
+            Segment {
+                start: Position { x: 9, y: 9 },
+                end: Position { x: 9, y: -100 },
+            },
+            Segment {
+                start: Position { x: 2, y: 100 },
+                end: Position { x: 2, y: 1 },
+            },
+            Segment {
+                start: Position { x: 4, y: 100 },
+                end: Position { x: 4, y: 1 },
+            },
+            Segment {
+                start: Position { x: 6, y: 100 },
+                end: Position { x: 6, y: 1 },
+            },
+            Segment {
+                start: Position { x: 8, y: 100 },
+                end: Position { x: 8, y: 1 },
+            },
+        ]
+    }
+
+    #[test]
+    fn test_maze() {
+        let start = Position { x: 0, y: 0 };
+        let end = Position { x: 10, y: 10 };
+        let segments = maze();
+        let got = find_path(start, &segments, end);
+        assert_eq!(got, Some(vec![
+            Position { x: 0, y: 0 },
+            Position { x: 1, y: 9 },
+            Position { x: 2, y: 1 },
+            Position { x: 3, y: 9 },
+            Position { x: 4, y: 1 },
+            Position { x: 5, y: 9 },
+            Position { x: 6, y: 1 },
+            Position { x: 7, y: 9 },
+            Position { x: 8, y: 1 },
+            Position { x: 9, y: 9 },
+            Position { x: 10, y: 10 },
+        ]))
+    }
+
     #[bench]
     fn bench_find_path(b: &mut Bencher) {
         let start = Position { x: 0, y: 0 };
         let end = Position { x: 10, y: 10 };
-        let segments = [
-            Segment {
-                start: Position { x: -1, y: 0 },
-                end: Position { x: 11, y: 0 },
-            },
-            Segment {
-                start: Position { x: 10, y: 11 },
-                end: Position { x: 10, y: -1 },
-            },
-            Segment {
-                start: Position { x: 11, y: 10 },
-                end: Position { x: -1, y: 10 },
-            },
-            Segment {
-                start: Position { x: 0, y: 11 },
-                end: Position { x: 0, y: -1 },
-            },
-            Segment {
-                start: Position { x: 1, y: 9 },
-                end: Position { x: 1, y: -1 },
-            },
-            Segment {
-                start: Position { x: 3, y: 9 },
-                end: Position { x: 3, y: -1 },
-            },
-            Segment {
-                start: Position { x: 5, y: 9 },
-                end: Position { x: 5, y: -1 },
-            },
-            Segment {
-                start: Position { x: 7, y: 9 },
-                end: Position { x: 7, y: -1 },
-            },
-            Segment {
-                start: Position { x: 9, y: 9 },
-                end: Position { x: 9, y: -1 },
-            },
-            Segment {
-                start: Position { x: 2, y: -11 },
-                end: Position { x: 2, y: 1 },
-            },
-            Segment {
-                start: Position { x: 4, y: -11 },
-                end: Position { x: 4, y: 1 },
-            },
-            Segment {
-                start: Position { x: 6, y: -11 },
-                end: Position { x: 6, y: 1 },
-            },
-            Segment {
-                start: Position { x: 8, y: -11 },
-                end: Position { x: 8, y: 1 },
-            },
-        ];
+        let segments = maze();
         b.iter(|| {
             find_path(start, &segments, end);
         });

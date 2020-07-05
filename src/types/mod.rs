@@ -1,5 +1,6 @@
 pub(crate) mod heap_element;
 
+#[repr(C)]
 #[derive(Debug, PartialEq, Eq, Clone, Copy, Hash)]
 pub struct Position {
     pub x: i32,
