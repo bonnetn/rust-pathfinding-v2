@@ -4,6 +4,7 @@ dist:
 os:
 - linux
 - windows
+- osx
 arch:
 - arm64
 - amd64
@@ -19,7 +20,7 @@ script:
 - cargo test --verbose --all
 - cargo build --release --verbose --all
 before_deploy:
-  - ls -la "target/release/libpathfinder_v2.so"
+  - ls -la target/release/libpathfinder_v2.so
   - mv "target/release/libpathfinder_v2.so" "target/release/libpathfinder_v2-$TRAVIS_TAG-$TRAVIS_OS_NAME.so"
 deploy:
   provider: releases
