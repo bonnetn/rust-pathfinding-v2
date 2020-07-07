@@ -2,14 +2,14 @@ language: rust
 dist:
   - trusty
 os:
-- windows
-# - linux
-# - osx
+  - windows
+  - linux
+  - osx
 arch:
-- arm64
-- amd64
+  - arm64
+  - amd64
 rust:
-- nightly
+  - nightly
 jobs:
   fast_finish: true
 script:
