@@ -18,7 +18,7 @@ script:
 - cargo test --verbose --all
 - cargo build --release --verbose --all
 before_deploy:
-  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then mv "target/release/libpathfinder_v2.dll" "target/release/libpathfinder_v2-$TRAVIS_TAG-$TRAVIS_OS_NAME.dll"; fi
+  - if [ "$TRAVIS_OS_NAME" = "windows" ]; then mv "target/release/libpathfinder_v2.dll" "target/release/libpathfinder_v2-$TRAVIS_TAG-$TRAVIS_OS_NAME.dll"; fi
   - if [ "$TRAVIS_OS_NAME" = "osx" ]; then mv "target/release/libpathfinder_v2.dylib" "target/release/libpathfinder_v2-$TRAVIS_TAG-$TRAVIS_OS_NAME.dylib"; fi
   - if [ "$TRAVIS_OS_NAME" = "linux" ]; then mv "target/release/libpathfinder_v2.so" "target/release/libpathfinder_v2-$TRAVIS_TAG-$TRAVIS_OS_NAME.so"; fi
 deploy:
