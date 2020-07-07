@@ -12,7 +12,6 @@ rust:
 - nightly
 jobs:
   fast_finish: true
-cache: cargo
 script:
 - cargo build --verbose --all
 - cargo test --verbose --all
