@@ -1,0 +1,18 @@
+language: rust
+os:
+  - linux
+  - windows
+arch:
+  - arm64
+  - amd64
+rust:
+  - nightly
+jobs:
+  allow_failures:
+    - rust: nightly
+  fast_finish: true
+cache: cargo
+language: rust
+script:
+  - cargo build --verbose --all
+  - cargo test --verbose --all
