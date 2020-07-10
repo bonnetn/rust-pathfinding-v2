@@ -1,6 +1,6 @@
 pipeline {
     environment {
-        GITHUB_TOKEN = credentials('test_token')
+        GITHUB_TOKEN = credentials('github_token_release')
     }
     agent { 
       dockerfile true
@@ -8,7 +8,7 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                sh 'env'
+                sh 'bash publish_github_release.sh "$GITHUB_TOKEN" *'
             }
         }
     }
