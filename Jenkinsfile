@@ -2,6 +2,7 @@ pipeline {
     environment {
         GITHUB_TOKEN = credentials('github_token_release')
     }
+    agent none
     stages {
         stage('Build') {
             agent { 
