@@ -1,25 +1,45 @@
+##[BASE]###################
 FROM rust:1.44-slim-buster AS base
 RUN rustup update
+
+##[LINUX 64 BITS]##########
+
+FROM base AS x86_64_linux
+RUN rustup target add x86_64-unknown-linux-gnu
 
 WORKDIR /usr/src/pathfinding
 COPY ./Cargo.toml .
 COPY ./src ./src
 
-FROM base AS x86_64_linux
-RUN rustup target add x86_64-unknown-linux-gnu
 RUN cargo build --target=x86_64-unknown-linux-gnu --release --verbose --all
+
+##[LINUX ARM]##############
 
 FROM base AS armv7l_linux
 RUN apt-get update && apt-get install -y gcc-arm-linux-gnueabihf 
 RUN rustup target add arm-unknown-linux-gnueabihf
 RUN mkdir .cargo && echo '[target.arm-unknown-linux-gnueabihf]\nlinker = "arm-linux-gnueabihf-gcc"' > .cargo/config
+
+WORKDIR /usr/src/pathfinding
+COPY ./Cargo.toml .
+COPY ./src ./src
+
 RUN cargo build --target=arm-unknown-linux-gnueabihf --release --verbose --all
+
+##[WINDOWS 64BITS]#########
 
 FROM base AS x86_64_windows
 RUN apt-get update && apt-get install -y mingw-w64 
 RUN rustup target add x86_64-pc-windows-gnu
 RUN mkdir .cargo && echo '[target.x86_64-pc-windows-gnu]\nlinker = "x86_64-w64-mingw32-gcc"\nar = "x86_64-w64-mingw32-gcc-ar"' > .cargo/config
+
+WORKDIR /usr/src/pathfinding
+COPY ./Cargo.toml .
+COPY ./src ./src
+
 RUN cargo build --target=x86_64-pc-windows-gnu --release --verbose --all
+
+##[MAC OS 64BITS]##########
 
 FROM base AS x86_64_osx
 
@@ -33,7 +53,14 @@ RUN UNATTENDED=yes OSX_VERSION_MIN=10.7 ./osxcross/build.sh
 RUN rustup target add x86_64-apple-darwin
 
 RUN mkdir .cargo && echo '[target.x86_64-apple-darwin]\nlinker = "x86_64-apple-darwin14-clang"\nar = "x86_64-apple-darwin14-ar"' > .cargo/config
+
+WORKDIR /usr/src/pathfinding
+COPY ./Cargo.toml .
+COPY ./src ./src
+
 RUN PATH=$PATH:/usr/src/pathfinding/osxcross/target/bin cargo build --target=x86_64-apple-darwin --release --verbose --all
+
+##[FINAL ARTIFACT]#########
 
 FROM alpine AS artifact
 WORKDIR /artifact
