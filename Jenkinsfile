@@ -8,7 +8,7 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                sh 'bash publish_github_release.sh "$GITHUB_TOKEN" *'
+                sh 'apk add --update bash && bash publish_github_release.sh "$GITHUB_TOKEN" /artifact/*'
             }
         }
     }
