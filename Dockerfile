@@ -2,7 +2,6 @@ FROM rust:1.44-slim-buster AS base
 RUN rustup update
 
 WORKDIR /usr/src/pathfinding
-COPY ./Cargo.lock .
 COPY ./Cargo.toml .
 COPY ./src ./src
 
