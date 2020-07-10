@@ -5,9 +5,10 @@ RUN rustup update
 ##[LINUX 64 BITS]##########
 
 FROM base AS x86_64_linux
+WORKDIR /usr/src/pathfinding
+
 RUN rustup target add x86_64-unknown-linux-gnu
 
-WORKDIR /usr/src/pathfinding
 COPY ./Cargo.toml .
 COPY ./src ./src
 
@@ -16,11 +17,12 @@ RUN cargo build --target=x86_64-unknown-linux-gnu --release --verbose --all
 ##[LINUX ARM]##############
 
 FROM base AS armv7l_linux
+WORKDIR /usr/src/pathfinding
+
 RUN apt-get update && apt-get install -y gcc-arm-linux-gnueabihf 
 RUN rustup target add arm-unknown-linux-gnueabihf
 RUN mkdir .cargo && echo '[target.arm-unknown-linux-gnueabihf]\nlinker = "arm-linux-gnueabihf-gcc"' > .cargo/config
 
-WORKDIR /usr/src/pathfinding
 COPY ./Cargo.toml .
 COPY ./src ./src
 
@@ -29,11 +31,12 @@ RUN cargo build --target=arm-unknown-linux-gnueabihf --release --verbose --all
 ##[WINDOWS 64BITS]#########
 
 FROM base AS x86_64_windows
+WORKDIR /usr/src/pathfinding
+
 RUN apt-get update && apt-get install -y mingw-w64 
 RUN rustup target add x86_64-pc-windows-gnu
 RUN mkdir .cargo && echo '[target.x86_64-pc-windows-gnu]\nlinker = "x86_64-w64-mingw32-gcc"\nar = "x86_64-w64-mingw32-gcc-ar"' > .cargo/config
 
-WORKDIR /usr/src/pathfinding
 COPY ./Cargo.toml .
 COPY ./src ./src
 
@@ -42,6 +45,7 @@ RUN cargo build --target=x86_64-pc-windows-gnu --release --verbose --all
 ##[MAC OS 64BITS]##########
 
 FROM base AS x86_64_osx
+WORKDIR /usr/src/pathfinding
 
 RUN apt-get update && apt-get install -y clang gcc g++ zlib1g-dev libmpc-dev libmpfr-dev libgmp-dev wget cmake git  patch python libssl-dev lzma-dev libxml2-dev bash 
 
@@ -54,7 +58,6 @@ RUN rustup target add x86_64-apple-darwin
 
 RUN mkdir .cargo && echo '[target.x86_64-apple-darwin]\nlinker = "x86_64-apple-darwin14-clang"\nar = "x86_64-apple-darwin14-ar"' > .cargo/config
 
-WORKDIR /usr/src/pathfinding
 COPY ./Cargo.toml .
 COPY ./src ./src
 
@@ -64,6 +67,7 @@ RUN PATH=$PATH:/usr/src/pathfinding/osxcross/target/bin cargo build --target=x86
 
 FROM alpine AS artifact
 WORKDIR /artifact
+
 COPY --from=x86_64_linux /usr/src/pathfinding/target/x86_64-unknown-linux-gnu/release/libpathfinder_v2.so ./pathfinder_x86_64_linux.so
 COPY --from=armv7l_linux /usr/src/pathfinding/target/arm-unknown-linux-gnueabihf/release/libpathfinder_v2.so ./pathfinder_armv7l_linux.so
 COPY --from=x86_64_windows /usr/src/pathfinding/target/x86_64-pc-windows-gnu/release/pathfinder_v2.dll ./pathfinder_x86_64_windows.dll
