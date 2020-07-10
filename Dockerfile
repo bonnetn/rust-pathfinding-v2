@@ -2,9 +2,9 @@ FROM rust:1.44-slim-buster AS base
 RUN rustup update
 
 WORKDIR /usr/src/pathfinding
-COPY ./Cargo.lock .
-COPY ./Cargo.toml .
-COPY ./src ./src
+COPY ./rust-pathfinding-v2/Cargo.lock .
+COPY ./rust-pathfinding-v2/Cargo.toml .
+COPY ./rust-pathfinding-v2/src ./src
 
 FROM base AS x86_64_linux
 RUN rustup target add x86_64-unknown-linux-gnu
