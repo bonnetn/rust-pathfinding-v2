@@ -2,13 +2,23 @@ pipeline {
     environment {
         GITHUB_TOKEN = credentials('github_token_release')
     }
-    agent { 
-      dockerfile true
-    }
     stages {
         stage('Build') {
+            agent { 
+              dockerfile true
+            }
             steps {
-                sh 'apk add --update bash curl git && bash publish_github_release.sh "$GITHUB_TOKEN" /artifact/*'
+                sh 'apk add --update bash curl git && bash scripts/publish_github_release.sh "$GITHUB_TOKEN" /artifact/*'
+            }
+        }
+        stage('Test') {
+            agent { 
+              dockerfile {
+                filename 'Dockerfile_test'
+              }
+            }
+            steps {
+                sh 'cargo test'
             }
         }
     }
