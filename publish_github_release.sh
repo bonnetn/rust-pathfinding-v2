@@ -18,7 +18,7 @@ message="$(git for-each-ref refs/tags/$tag --format='%(contents)')"
 name=$(echo "$message" | head -n1)
 
 description=$(echo "$message" | tail -n +3)
-description=$(echo "$description" | sed -z 's/\n/\\n/g') # Escape line breaks to prevent json parsing problems
+description=$(echo "$description" | sed 's/\n/\\n/g') # Escape line breaks to prevent json parsing problems
 
 # Create a release
 release=$(curl -XPOST -H "Authorization:token $token" --data "{\"tag_name\": \"$tag\", \"target_commitish\": \"master\", \"name\": \"$name\", \"body\": \"$description\", \"draft\": false, \"prerelease\": true}" https://api.github.com/repos/bonnetn/rust-pathfinding-v2/releases)
