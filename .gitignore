@@ -2,4 +2,5 @@
 Cargo.lock
 .idea
 venv
+build
 **/__pycache__

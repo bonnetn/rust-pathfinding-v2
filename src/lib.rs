@@ -1,7 +1,3 @@
-#![feature(test)]
-extern crate test;
-
-
 use std::cmp::min;
 use std::collections::{BinaryHeap, HashMap};
 use std::f64::INFINITY;
@@ -109,8 +105,6 @@ fn get_path(prev: HashMap<Position, Position>, destination: Position) -> Vec<Pos
 
 #[cfg(test)]
 mod tests {
-    use test::Bencher;
-
     use super::*;
 
     #[test]
@@ -243,15 +237,5 @@ mod tests {
             Position { x: 9, y: 9 },
             Position { x: 10, y: 10 },
         ]))
-    }
-
-    #[bench]
-    fn bench_find_path(b: &mut Bencher) {
-        let start = Position { x: 0, y: 0 };
-        let end = Position { x: 10, y: 10 };
-        let segments = maze();
-        b.iter(|| {
-            find_path(start, &segments, end);
-        });
     }
 }
