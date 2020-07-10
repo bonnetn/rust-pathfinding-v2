@@ -21,8 +21,17 @@ python3 main.py
 ```
 cargo +nightly test
 ```
+or 
+```
+./scripts/test.sh
+```
 
 ### Benchmark
 ```
 cargo +nightly bench
+```
+
+### Build library for Mac/Linux/Windows
+```
+./scripts/build.sh
 ```
